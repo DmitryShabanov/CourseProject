@@ -1,3 +1,6 @@
+package UserInterface;
+
+import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.*;
@@ -8,8 +11,10 @@ import java.awt.event.*;
 public class DragListener extends MouseInputAdapter {
     private Point location;
     private MouseEvent pressed;
+    private JPanel dropPanel;
 
-    public DragListener() {
+    public DragListener(JPanel dropPanel) {
+        this.dropPanel = dropPanel;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -21,6 +26,12 @@ public class DragListener extends MouseInputAdapter {
         location = component.getLocation(location);
         int x = location.x - pressed.getX() + e.getX();
         int y = location.y - pressed.getY() + e.getY();
+        if (x + component.getWidth() > dropPanel.getWidth() + dropPanel.getX() || x < 0) {
+            return;
+        }
+        if (y + component.getHeight() > dropPanel.getHeight() || y < 0) {
+            return;
+        }
         component.setLocation(x, y);
     }
 }

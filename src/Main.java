@@ -1,4 +1,5 @@
 import Graph.Graph;
+import UserInterface.UIForm;
 
 /**
  * Created by dmitry on 05.04.16.
@@ -7,7 +8,7 @@ public class Main {
 
     public static void main(String ... args) {
 
-        int[][] array = {
+        /*int[][] array = {
                 {0, 1, 4, 0, 2, 0},
                 {0, 0, 0, 9, 0, 0},
                 {4, 0, 0, 7, 0, 0},
@@ -20,7 +21,9 @@ public class Main {
         graph.initGraph(array);
         graph.show();
         graph.floyd();
-        graph.printWay(1, 6);
+        graph.printWay(1, 6);*/
+
+        UIForm frame = new UIForm();
 
     }
 
