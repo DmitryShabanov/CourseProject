@@ -16,6 +16,8 @@ public class UIForm extends JFrame {
     private JButton addVertex;
     private JButton addEdge;
     private JPanel workPanel;
+    private Vertex vertex = new Vertex(workPanel);
+    private ArrayList<Vertex> vertexArray = new ArrayList<>();
 
     public UIForm() throws HeadlessException {
         super("Graph Builder");
@@ -34,12 +36,10 @@ public class UIForm extends JFrame {
     public class AddListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JLabel dropLabel = new JLabel("vertex");
-            DragListener drag = new DragListener(workPanel);
-            dropLabel.addMouseListener(drag);
-            dropLabel.addMouseMotionListener(drag);
-            workPanel.add(dropLabel);
-            workPanel.validate();
+            Vertex newVer = vertex.clone();
+            newVer.setNumber(vertexArray.size());
+            newVer.draw();
+            vertexArray.add(newVer);
         }
     }
 
