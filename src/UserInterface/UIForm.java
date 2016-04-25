@@ -18,6 +18,7 @@ public class UIForm extends JFrame {
     private JPanel workPanel;
     private Vertex vertex = new Vertex(workPanel);
     private ArrayList<Vertex> vertexArray = new ArrayList<>();
+    private ArrayList<Point> pointArray = new ArrayList<>();
 
     public UIForm() throws HeadlessException {
         super("Graph Builder");
@@ -33,20 +34,36 @@ public class UIForm extends JFrame {
         setVisible(true);
     }
 
+    public void rePaint() {
+        int counter = 0;
+        for (Point current : pointArray) {
+            vertexArray.get(counter).setLocation(current);
+            counter++;
+        }
+    }
+
     public class AddListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            pointArray = new ArrayList<>();
+            if (vertexArray.size() > 0) {
+                for (Vertex current : vertexArray) {
+                    pointArray.add(current.getLocation());
+                }
+            }
             Vertex newVer = vertex.clone();
             newVer.setNumber(vertexArray.size());
             newVer.draw();
             vertexArray.add(newVer);
+            rePaint();
+
         }
     }
 
     private void addMenu() {
         JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Menu");
-        JMenuItem menuItem = new JMenuItem("Add vertex");
+        JMenu menu = new JMenu("Меню");
+        JMenuItem menuItem = new JMenuItem("Добавить вершину");
 
         menu.add(menuItem);
         menuBar.add(menu);

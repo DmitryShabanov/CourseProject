@@ -1,6 +1,7 @@
 package UserInterface;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Created by dmitry on 15.04.16.
@@ -16,6 +17,14 @@ public class Vertex implements Cloneable {
         this.panel = panel;
     }
 
+    public Point getLocation() {
+        return new Point(icon.getX(), icon.getY());
+    }
+
+    public void setLocation(Point location) {
+        icon.setLocation(location);
+    }
+
     public void draw() {
         DragListener drag = new DragListener(panel);
         icon.addMouseListener(drag);
@@ -29,7 +38,11 @@ public class Vertex implements Cloneable {
         icon.setText(this.number);
         icon.setVerticalTextPosition(SwingConstants.CENTER);
         icon.setHorizontalTextPosition(SwingConstants.CENTER);
+    }
 
+    @Override
+    public String toString() {
+        return number;
     }
 
     @Override
