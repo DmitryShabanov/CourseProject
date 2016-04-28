@@ -1,5 +1,4 @@
-import Graph.Graph;
-import UserInterface.UIForm;
+import UserInterface.GraphBuilder;
 
 /**
  * Created by dmitry on 05.04.16.
@@ -23,7 +22,7 @@ public class Main {
         graph.floyd();
         graph.printWay(1, 6);*/
 
-        UIForm frame = new UIForm();
+        GraphBuilder frame = new GraphBuilder();
 
     }
 
