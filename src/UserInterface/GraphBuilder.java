@@ -88,6 +88,15 @@ public class GraphBuilder extends JFrame {
                 }
                 edgeFlag = false;
                 workPanel.addEdge(edge);
+                workPanel.add(edge.getWeight());
+                points = new ArrayList<>();
+                if (vertexes.size() > 0) {
+                    for (Vertex current : vertexes) {
+                        points.add(current.getLocation());
+                    }
+                }
+                workPanel.validate();
+                rePaint();
             }
         }
     }

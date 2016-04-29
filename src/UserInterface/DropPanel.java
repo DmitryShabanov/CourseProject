@@ -28,6 +28,7 @@ public class DropPanel extends JPanel {
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (Edge edge : edges) {
             graphics2D.drawLine(edge.getStart().getCenterX(), edge.getStart().getCenterY(), edge.getEnd().getCenterX(), edge.getEnd().getCenterY());
+            edge.drawWeight();
         }
     }
 }
