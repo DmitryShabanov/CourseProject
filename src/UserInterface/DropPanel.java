@@ -12,6 +12,11 @@ public class DropPanel extends JPanel {
     private ArrayList<Edge> edges = new ArrayList<>();
 
     public void addEdge(Edge edge) {
+        for (Edge current : edges) {
+            if (current.equals(edge)) {
+                return;
+            }
+        }
         edges.add(edge);
         repaint();
     }
@@ -22,7 +27,7 @@ public class DropPanel extends JPanel {
         Graphics2D graphics2D = (Graphics2D) g;
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         for (Edge edge : edges) {
-            graphics2D.drawLine((int) edge.getStart().getX(), (int) edge.getStart().getY(), (int) edge.getEnd().getX(), (int) edge.getEnd().getY());
+            graphics2D.drawLine(edge.getStart().getCenterX(), edge.getStart().getCenterY(), edge.getEnd().getCenterX(), edge.getEnd().getCenterY());
         }
     }
 }

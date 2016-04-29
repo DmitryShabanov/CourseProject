@@ -32,16 +32,6 @@ public class GraphBuilder extends JFrame {
         addToolBar();
         add(workPanel);
 
-       /* Edge e = new Edge();
-        e.setStart(new Point(30, 30));
-        e.setEnd(new Point(180, 190));
-        workPanel.addEdge(e);
-
-        Edge e1 = new Edge();
-        e1.setStart(new Point(320, 10));
-        e1.setEnd(new Point(180, 190));
-        workPanel.addEdge(e1);*/
-
         setVisible(true);
     }
 
@@ -76,17 +66,26 @@ public class GraphBuilder extends JFrame {
     }
 
     public class AddEdgeListener extends MouseInputAdapter {
-
         @Override
         public void mouseClicked(MouseEvent e) {
-            int x = (int) (e.getComponent().getLocation().getX() + (e.getComponent().getWidth() / 2));
-            int y = (int) (e.getComponent().getLocation().getY() + (e.getComponent().getHeight() / 2));
+            JLabel component = (JLabel) e.getComponent();
             if (!edgeFlag) {
                 edge = new Edge();
-                edge.setStart(new Point(x, y));
+                for (Vertex current : vertexes) {
+                    if (current.getNumber().compareTo(component.getText()) == 0) {
+                        edge.setStart(current);
+                    }
+                }
                 edgeFlag = true;
             } else {
-                edge.setEnd(new Point(x, y));
+                for (Vertex current : vertexes) {
+                    if (current.getNumber().compareTo(component.getText()) == 0) {
+                        if (component.getX() == edge.getStart().getLocation().getX() && component.getY() == edge.getStart().getLocation().getY()) {
+                            return;
+                        }
+                        edge.setEnd(current);
+                    }
+                }
                 edgeFlag = false;
                 workPanel.addEdge(edge);
             }
@@ -95,7 +94,7 @@ public class GraphBuilder extends JFrame {
 
     private void addToolBar() {
         JToolBar toolBar = new JToolBar();
-        JButton vertex = new JButton("Vertex");
+        JButton vertex = new JButton("Вершина");
         AddVertexListener l = new AddVertexListener();
 
         toolBar.add(vertex);

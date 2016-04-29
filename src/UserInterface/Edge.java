@@ -1,27 +1,29 @@
 package UserInterface;
 
-import java.awt.*;
-
 /**
  * Created by dmitry on 28.04.16.
  */
 public class Edge {
 
-    private Point start, end;
+    private Vertex start, end;
 
-    public Point getStart() {
+    public Vertex getStart() {
         return start;
     }
 
-    public void setStart(Point start) {
+    public void setStart(Vertex start) {
         this.start = start;
     }
 
-    public Point getEnd() {
+    public Vertex getEnd() {
         return end;
     }
 
-    public void setEnd(Point end) {
+    public void setEnd(Vertex end) {
         this.end = end;
+    }
+
+    public boolean equals(Edge edge) {
+        return edge.getStart().equals(start) && edge.getEnd().equals(end) || edge.getStart().equals(end) && edge.getEnd().equals(start);
     }
 }

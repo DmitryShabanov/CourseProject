@@ -18,7 +18,7 @@ public class Vertex implements Cloneable {
     }
 
     public Point getLocation() {
-        return new Point(icon.getX(), icon.getY());
+        return new Point(icon.getLocation());
     }
 
     public void setLocation(Point location) {
@@ -33,12 +33,16 @@ public class Vertex implements Cloneable {
         panel.validate();
     }
 
-    public int getHeight() {
-        return icon.getHeight();
+    public String getNumber() {
+        return number;
     }
 
-    public int getWidth() {
-        return icon.getWidth();
+    public int getCenterX() {
+        return (icon.getWidth() / 2) + icon.getX();
+    }
+
+    public int getCenterY() {
+        return (icon.getHeight() / 2) + icon.getY();
     }
 
     public JLabel getIcon() {
@@ -50,6 +54,10 @@ public class Vertex implements Cloneable {
         icon.setText(this.number);
         icon.setVerticalTextPosition(SwingConstants.CENTER);
         icon.setHorizontalTextPosition(SwingConstants.CENTER);
+    }
+
+    public boolean equals(Vertex vertex) {
+        return vertex.getCenterX() == getCenterX() && vertex.getCenterY() == getCenterY() && vertex.getNumber().compareTo(number) == 0;
     }
 
     @Override

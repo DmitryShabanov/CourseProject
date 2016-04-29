@@ -36,5 +36,6 @@ public class DragListener extends MouseInputAdapter {
             return;
         }
         component.setLocation(x, y);
+        dropPanel.repaint();
     }
 }
