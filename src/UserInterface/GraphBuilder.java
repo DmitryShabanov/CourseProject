@@ -35,23 +35,10 @@ public class GraphBuilder extends JFrame {
         setVisible(true);
     }
 
-    public void rePaint() {
-        int counter = 0;
-        for (Point current : points) {
-            vertexes.get(counter).setLocation(current);
-            counter++;
-        }
-    }
-
     public class AddVertexListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            points = new ArrayList<>();
-            if (vertexes.size() > 0) {
-                for (Vertex current : vertexes) {
-                    points.add(current.getLocation());
-                }
-            }
+            saveState();
             Vertex newVer = vertex.clone();
             newVer.setNumber(vertexes.size());
             newVer.draw();
@@ -88,15 +75,26 @@ public class GraphBuilder extends JFrame {
                 }
                 edgeFlag = false;
                 workPanel.addEdge(edge);
-                workPanel.add(edge.getWeight());
-                points = new ArrayList<>();
-                if (vertexes.size() > 0) {
-                    for (Vertex current : vertexes) {
-                        points.add(current.getLocation());
-                    }
-                }
+                saveState();
                 workPanel.validate();
                 rePaint();
+            }
+        }
+    }
+
+    public void rePaint() {
+        int counter = 0;
+        for (Point current : points) {
+            vertexes.get(counter).setLocation(current);
+            counter++;
+        }
+    }
+
+    public void saveState() {
+        points = new ArrayList<>();
+        if (vertexes.size() > 0) {
+            for (Vertex current : vertexes) {
+                points.add(current.getLocation());
             }
         }
     }

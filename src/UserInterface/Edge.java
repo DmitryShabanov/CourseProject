@@ -36,8 +36,8 @@ public class Edge {
         this.end = end;
     }
 
-    public void setWeight(String weight) {
-        this.weight.setText(weight);
+    public void setWeight(JTextField weight) {
+        this.weight = weight;
     }
 
     public JTextField getWeight() {
@@ -45,6 +45,10 @@ public class Edge {
     }
 
     public boolean equals(Edge edge) {
-        return edge.getStart().equals(start) && edge.getEnd().equals(end) || edge.getStart().equals(end) && edge.getEnd().equals(start);
+        return edge.getStart().equals(start) && edge.getEnd().equals(end);
+    }
+
+    public boolean counterEdge(Edge edge) {
+        return edge.getEnd().equals(start) && edge.getStart().equals(end);
     }
 }
