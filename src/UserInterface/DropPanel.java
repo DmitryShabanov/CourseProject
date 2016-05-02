@@ -61,4 +61,32 @@ public class DropPanel extends JPanel {
         g.drawLine(x1, y1, x2, y2);
         g.fillPolygon(xPoints, yPoints, 3);
     }
+
+    public ArrayList<Integer> getShortestWay(int size, int start, int finish, JTextField resField) {
+        int[][] vertexArray = new int[size][size];
+        for (int i = 0; i < vertexArray.length; i++) {
+            for (int j = 0; j < vertexArray[i].length; j++) {
+                vertexArray[i][j] = 0;
+            }
+        }
+
+        for (Edge current : edges) {
+            int i = Integer.valueOf(current.getStart().getNumber());
+            int j = Integer.valueOf(current.getEnd().getNumber());
+            current.validWeight();
+            vertexArray[i][j] = (int) current.getWeight().getValue();
+        }
+
+        Graph graph = new Graph(vertexArray);
+
+        graph.floyd();
+        int weight = graph.printWay(start, finish);
+        if (weight < 0) {
+            resField.setText("не существует!");
+        } else {
+            resField.setText("" + weight);
+        }
+
+        return graph.getResult();
+    }
 }

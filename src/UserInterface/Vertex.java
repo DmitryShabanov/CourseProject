@@ -13,7 +13,7 @@ public class Vertex implements Cloneable {
     private String number = "";
 
     public Vertex(JPanel panel) {
-        icon = new JLabel(new ImageIcon("src/UserInterface/ver.png"));
+        icon = new JLabel(new ImageIcon("ver.png"));
         this.panel = panel;
     }
 
@@ -31,6 +31,14 @@ public class Vertex implements Cloneable {
         icon.addMouseMotionListener(drag);
         panel.add(icon);
         panel.validate();
+    }
+
+    public void resetIcon() {
+        icon.setIcon(new ImageIcon("ver.png"));
+    }
+
+    public void changeIcon() {
+        icon.setIcon(new ImageIcon("selectedVer.png"));
     }
 
     public String getNumber() {

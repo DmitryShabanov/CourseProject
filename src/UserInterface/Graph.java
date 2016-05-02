@@ -1,4 +1,6 @@
-package Graph;
+package UserInterface;
+
+import java.util.ArrayList;
 
 /**
  * Created by dmitry on 05.04.16.
@@ -7,8 +9,9 @@ public class Graph {
 
     private int[][] vertexArray;
     private int[][] parentArray;
+    private ArrayList<Integer> result = new ArrayList<>();
 
-    public void initGraph(int[][] vertexArray) {
+    public Graph(int[][] vertexArray) {
         this.vertexArray = new int[vertexArray.length][vertexArray.length];
         parentArray = new int[vertexArray.length][vertexArray.length];
         for (int i = 0; i < vertexArray.length; i++) {
@@ -46,25 +49,36 @@ public class Graph {
             }
     }
 
+    public ArrayList<Integer> getResult() {
+        return result;
+    }
+
     private void getWay(int current, int start) {
         if (current == start) {
-            System.out.print(current + 1 + " ");
+            result.add(current);
+            //System.out.print(current + " ");
         } else {
             getWay(parentArray[start][current], start);
-            System.out.print(current + 1 + " ");
+            //System.out.print(current + " ");
+            result.add(current);
         }
     }
 
-    public void printWay(int start, int finish) {
-        start--;
-        finish--;
-        System.out.print("\nWeight " + (start + 1) + " to " + (finish + 1) + " = ");
-        if (vertexArray[start][finish] < Integer.MAX_VALUE) {
-            System.out.println(vertexArray[start][finish]);
-            getWay(finish, start);
-        } else {
-            System.out.println("Not exists a way!");
+    public int printWay(int start, int finish) {
+        if (start < 0 || start > vertexArray.length || finish < 0 || finish > vertexArray.length) {
+            System.out.println("Not a vertex!");
+            return -1;
         }
+        //System.out.print("\nWeight " + start + " to " + finish + " = ");
+        if (vertexArray[start][finish] < Integer.MAX_VALUE) {
+            //System.out.println(vertexArray[start][finish]);
+            getWay(finish, start);
+            //System.out.println();
+        } else {
+            //System.out.println("Not exists a way!");
+            return -1;
+        }
+        return vertexArray[start][finish];
     }
 
 }

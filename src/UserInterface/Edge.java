@@ -8,10 +8,23 @@ import javax.swing.*;
 public class Edge {
 
     private Vertex start, end;
-    private JTextField weight;
+    private JFormattedTextField weight;
 
     public Edge() {
-        weight = new JTextField("1", 2);
+        weight = new JFormattedTextField(1);
+        weight.setColumns(2);
+    }
+
+    public void validWeight() {
+        if (weight.getValue() == null) {
+            weight.setValue(1);
+        }
+        if ((Integer) weight.getValue() < 0) {
+            weight.setValue(Math.abs((Integer) weight.getValue()));
+        }
+        if ((Integer) weight.getValue() == 0) {
+            weight.setValue(1);
+        }
     }
 
     public void drawWeight() {
@@ -36,11 +49,11 @@ public class Edge {
         this.end = end;
     }
 
-    public void setWeight(JTextField weight) {
+    public void setWeight(JFormattedTextField weight) {
         this.weight = weight;
     }
 
-    public JTextField getWeight() {
+    public JFormattedTextField getWeight() {
         return weight;
     }
 

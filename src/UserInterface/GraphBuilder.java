@@ -3,9 +3,7 @@ package UserInterface;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 /**
@@ -21,6 +19,10 @@ public class GraphBuilder extends JFrame {
     private Edge edge;
     private boolean edgeFlag = false;
 
+    private JFormattedTextField start = new JFormattedTextField(0);
+    private JFormattedTextField finish = new JFormattedTextField(0);
+    private JTextField resultField = new JTextField();
+
     public GraphBuilder() throws HeadlessException {
         super("Graph Builder");
         pack();
@@ -32,7 +34,46 @@ public class GraphBuilder extends JFrame {
         addToolBar();
         add(workPanel);
 
+        workPanel.addMouseListener(new EdgeUnFocusListener());
+
         setVisible(true);
+    }
+
+    private void addToolBar() {
+        JToolBar toolBar = new JToolBar();
+        JButton addVer = new JButton("Вершина");
+        JButton calculateWay = new JButton("Путь");
+
+        addVer.addActionListener(new AddVertexListener());
+        calculateWay.addActionListener(new WayListener());
+        start.setColumns(2);
+        finish.setColumns(2);
+
+        toolBar.add(addVer);
+        toolBar.add(calculateWay);
+        toolBar.add(new JLabel(" Начальная вершина:  "));
+
+        toolBar.add(start);
+        start.setMaximumSize(new Dimension(30, 20));
+        toolBar.add(new JLabel(" Конечная вершина:  "));
+        toolBar.add(finish);
+        finish.setMaximumSize(new Dimension(30, 20));
+        toolBar.add(new JLabel(" Вес кратчайшего пути: "));
+        toolBar.add(resultField);
+        resultField.setMaximumSize(new Dimension(140, 20));
+        resultField.setEditable(false);
+
+        this.add(toolBar, BorderLayout.NORTH);
+    }
+
+    private void addMenu() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Меню");
+        JMenuItem menuItem = new JMenuItem("Добавить вершину");
+
+        menu.add(menuItem);
+        menuBar.add(menu);
+        this.setJMenuBar(menuBar);
     }
 
     public class AddVertexListener implements ActionListener {
@@ -82,7 +123,48 @@ public class GraphBuilder extends JFrame {
         }
     }
 
-    public void rePaint() {
+    public class WayListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (Vertex vertex : vertexes) {
+                vertex.resetIcon();
+            }
+            validWay(start);
+            validWay(finish);
+            if (vertexes.size() == 0) {
+                return;
+            }
+            if ((int) start.getValue() == (int) finish.getValue()) {
+                resultField.setText("не существует!");
+                return;
+            }
+            ArrayList<Integer> result = workPanel.getShortestWay(vertexes.size(), (int) start.getValue(), (int) finish.getValue(), resultField);
+            for (Integer current : result) {
+                vertexes.get(current).changeIcon();
+            }
+        }
+    }
+
+    public class EdgeUnFocusListener extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            edgeFlag = false;
+        }
+    }
+
+    private void validWay(JFormattedTextField tf) {
+        if (tf.getValue() == null) {
+            tf.setValue(0);
+        }
+        if ((Integer) tf.getValue() < 0) {
+            tf.setValue(Math.abs((Integer) tf.getValue()));
+        }
+        if ((Integer) tf.getValue() > vertexes.size() - 1) {
+            tf.setValue(0);
+        }
+    }
+
+    private void rePaint() {
         int counter = 0;
         for (Point current : points) {
             vertexes.get(counter).setLocation(current);
@@ -90,33 +172,12 @@ public class GraphBuilder extends JFrame {
         }
     }
 
-    public void saveState() {
+    private void saveState() {
         points = new ArrayList<>();
         if (vertexes.size() > 0) {
             for (Vertex current : vertexes) {
                 points.add(current.getLocation());
             }
         }
-    }
-
-    private void addToolBar() {
-        JToolBar toolBar = new JToolBar();
-        JButton vertex = new JButton("Вершина");
-        AddVertexListener l = new AddVertexListener();
-
-        toolBar.add(vertex);
-        vertex.addActionListener(l);
-
-        this.add(toolBar, BorderLayout.NORTH);
-    }
-
-    private void addMenu() {
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Меню");
-        JMenuItem menuItem = new JMenuItem("Добавить вершину");
-
-        menu.add(menuItem);
-        menuBar.add(menu);
-        this.setJMenuBar(menuBar);
     }
 }
