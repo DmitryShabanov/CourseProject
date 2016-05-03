@@ -1,4 +1,4 @@
-package UserInterface;
+package application;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Created by dmitry on 15.04.16.
  */
-public class Vertex implements Cloneable {
+public class Vertex {
 
     private JLabel icon;
     private JPanel panel;
@@ -57,6 +57,10 @@ public class Vertex implements Cloneable {
         return icon;
     }
 
+    public void setIcon(JLabel icon) {
+        this.icon = icon;
+    }
+
     public void setNumber(int number) {
         this.number = number + "";
         icon.setText(this.number);
@@ -68,13 +72,10 @@ public class Vertex implements Cloneable {
         return vertex.getCenterX() == getCenterX() && vertex.getCenterY() == getCenterY() && vertex.getNumber().compareTo(number) == 0;
     }
 
-    @Override
-    public String toString() {
-        return number;
-    }
-
-    @Override
-    protected Vertex clone() {
-        return new Vertex(panel);
+    public Vertex copy() {
+        Vertex clone = new Vertex(panel);
+        clone.setNumber(Integer.valueOf(number));
+        clone.setLocation(getLocation());
+        return clone;
     }
 }

@@ -1,4 +1,4 @@
-import UserInterface.GraphBuilder;
+import application.GraphBuilder;
 
 /**
  * Created by dmitry on 05.04.16.

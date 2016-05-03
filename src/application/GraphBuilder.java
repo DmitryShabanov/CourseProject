@@ -1,4 +1,4 @@
-package UserInterface;
+package application;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -11,8 +11,7 @@ import java.util.ArrayList;
  */
 public class GraphBuilder extends JFrame {
 
-    private DropPanel workPanel = new DropPanel();
-    private Vertex vertex = new Vertex(workPanel);
+    private WorkPanel workPanel = new WorkPanel();
     private ArrayList<Vertex> vertexes = new ArrayList<>();
     private ArrayList<Point> points = new ArrayList<>();
 
@@ -22,6 +21,9 @@ public class GraphBuilder extends JFrame {
     private JFormattedTextField start = new JFormattedTextField(0);
     private JFormattedTextField finish = new JFormattedTextField(0);
     private JTextField resultField = new JTextField();
+
+    private JTextArea historyArea = new JTextArea(10, 0);
+    private History history = new History();
 
     public GraphBuilder() throws HeadlessException {
         super("Graph Builder");
@@ -34,8 +36,82 @@ public class GraphBuilder extends JFrame {
         addMenu();
         addToolBar();
         add(workPanel);
+        addHistory();
 
         setVisible(true);
+    }
+
+    private void saveVertexLocation() {
+        points = new ArrayList<>();
+        if (vertexes.size() > 0) {
+            for (Vertex current : vertexes) {
+                points.add(current.getLocation());
+            }
+        }
+    }
+
+    private void saveState() {
+        Memento state = new Memento(vertexes, workPanel.getEdges());
+        history.addState(state);
+    }
+
+    private void loadState() {
+        clearState();
+        Memento state = history.getNewestState();
+        vertexes = state.getVertexes();
+        for (Vertex current : vertexes) {
+            addVertex(current);
+        }
+
+        ArrayList<Edge> edges = state.getEdges();
+
+        for (Edge edge : edges) {
+            Edge newEdge = new Edge();
+            for (Vertex vertex: this.vertexes) {
+                if (vertex.getNumber().compareTo(edge.getStart().getNumber()) == 0) {
+                    newEdge.setStart(vertex);
+                }
+                if (vertex.getNumber().compareTo(edge.getEnd().getNumber()) == 0) {
+                    newEdge.setEnd(vertex);
+                }
+            }
+            newEdge.setWeight(edge.getWeight());
+            workPanel.addEdge(newEdge);
+        }
+
+        saveVertexLocation();
+        workPanel.validate();
+        rePaint();
+    }
+
+    private void clearState() {
+        points.clear();
+        vertexes.clear();
+        resultField.setText("");
+        workPanel.getEdges().clear();
+        workPanel.removeAll();
+        workPanel.validate();
+        workPanel.repaint();
+    }
+
+    private void rePaint() {
+        int counter = 0;
+        for (Point current : points) {
+            vertexes.get(counter).setLocation(current);
+            counter++;
+        }
+    }
+
+    private void validWay(JFormattedTextField tf) {
+        if (tf.getValue() == null) {
+            tf.setValue(0);
+        }
+        if ((Integer) tf.getValue() < 0) {
+            tf.setValue(Math.abs((Integer) tf.getValue()));
+        }
+        if ((Integer) tf.getValue() > vertexes.size() - 1) {
+            tf.setValue(0);
+        }
     }
 
     private void addToolBar() {
@@ -61,6 +137,31 @@ public class GraphBuilder extends JFrame {
         toolBar.add(resultField);
         resultField.setMaximumSize(new Dimension(140, 20));
         resultField.setEditable(false);
+        JButton clear = new JButton("Очистить");
+        clear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearState();
+            }
+        });
+        toolBar.add(clear);
+
+        JButton b1 = new JButton("save");
+        JButton b2 = new JButton("load");
+        toolBar.add(b1);
+        toolBar.add(b2);
+        b1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveState();
+            }
+        });
+        b2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadState();
+            }
+        });
 
         this.add(toolBar, BorderLayout.NORTH);
     }
@@ -75,23 +176,31 @@ public class GraphBuilder extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
+    private void addHistory() {
+        this.add(historyArea, BorderLayout.SOUTH);
+        historyArea.setEditable(false);
+        historyArea.setBackground(Color.LIGHT_GRAY);
+    }
+
+    private void addVertex(Vertex vertex) {
+        AddEdgeListener edgeListener = new AddEdgeListener();
+        vertex.getIcon().addMouseListener(edgeListener);
+        vertex.getIcon().addMouseMotionListener(edgeListener);
+        saveVertexLocation();
+        vertex.draw();
+        rePaint();
+    }
+
     public class AddVertexListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             for (Vertex current : vertexes) {
                 current.resetIcon();
             }
-            saveState();
-            Vertex newVer = vertex.clone();
+            Vertex newVer = new Vertex(workPanel);
             newVer.setNumber(vertexes.size());
-            newVer.draw();
-
-            AddEdgeListener drag = new AddEdgeListener();
-            newVer.getIcon().addMouseListener(drag);
-            newVer.getIcon().addMouseMotionListener(drag);
-
+            addVertex(newVer);
             vertexes.add(newVer);
-            rePaint();
         }
     }
 
@@ -130,7 +239,7 @@ public class GraphBuilder extends JFrame {
                 edgeFlag = false;
                 edge.getStart().resetIcon();
                 workPanel.addEdge(edge);
-                saveState();
+                saveVertexLocation();
                 workPanel.validate();
                 rePaint();
             }
@@ -155,35 +264,6 @@ public class GraphBuilder extends JFrame {
             ArrayList<Integer> result = workPanel.getShortestWay(vertexes.size(), (int) start.getValue(), (int) finish.getValue(), resultField);
             for (Integer current : result) {
                 vertexes.get(current).changeIcon();
-            }
-        }
-    }
-
-    private void validWay(JFormattedTextField tf) {
-        if (tf.getValue() == null) {
-            tf.setValue(0);
-        }
-        if ((Integer) tf.getValue() < 0) {
-            tf.setValue(Math.abs((Integer) tf.getValue()));
-        }
-        if ((Integer) tf.getValue() > vertexes.size() - 1) {
-            tf.setValue(0);
-        }
-    }
-
-    private void rePaint() {
-        int counter = 0;
-        for (Point current : points) {
-            vertexes.get(counter).setLocation(current);
-            counter++;
-        }
-    }
-
-    private void saveState() {
-        points = new ArrayList<>();
-        if (vertexes.size() > 0) {
-            for (Vertex current : vertexes) {
-                points.add(current.getLocation());
             }
         }
     }

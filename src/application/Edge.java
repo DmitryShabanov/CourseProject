@@ -1,4 +1,4 @@
-package UserInterface;
+package application;
 
 import javax.swing.*;
 
@@ -53,6 +53,10 @@ public class Edge {
         this.weight = weight;
     }
 
+    public void setWeight(int weight) {
+        this.weight.setValue(weight);
+    }
+
     public JFormattedTextField getWeight() {
         return weight;
     }
@@ -63,5 +67,13 @@ public class Edge {
 
     public boolean counterEdge(Edge edge) {
         return edge.getEnd().equals(start) && edge.getStart().equals(end);
+    }
+
+    public Edge copy() {
+        Edge clone = new Edge();
+        clone.setStart(start.copy());
+        clone.setEnd(end.copy());
+        clone.setWeight((Integer) weight.getValue());
+        return clone;
     }
 }

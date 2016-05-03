@@ -1,4 +1,4 @@
-package UserInterface;
+package application;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;

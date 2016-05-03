@@ -1,4 +1,4 @@
-package UserInterface;
+package application;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by dmitry on 26.04.16.
  */
-public class DropPanel extends JPanel {
+public class WorkPanel extends JPanel {
 
     private ArrayList<Edge> edges = new ArrayList<>();
 
@@ -26,6 +26,10 @@ public class DropPanel extends JPanel {
         edges.add(edge);
         repaint();
         add(edge.getWeight());
+    }
+
+    public ArrayList<Edge> getEdges() {
+        return edges;
     }
 
     @Override
