@@ -27,14 +27,13 @@ public class GraphBuilder extends JFrame {
         super("Graph Builder");
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 550);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
+        setResizable(false);
 
         addMenu();
         addToolBar();
         add(workPanel);
-
-        workPanel.addMouseListener(new EdgeUnFocusListener());
 
         setVisible(true);
     }
@@ -79,6 +78,9 @@ public class GraphBuilder extends JFrame {
     public class AddVertexListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            for (Vertex current : vertexes) {
+                current.resetIcon();
+            }
             saveState();
             Vertex newVer = vertex.clone();
             newVer.setNumber(vertexes.size());
@@ -97,6 +99,9 @@ public class GraphBuilder extends JFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             JLabel component = (JLabel) e.getComponent();
+            for (Vertex current : vertexes) {
+                current.resetIcon();
+            }
             if (!edgeFlag) {
                 edge = new Edge();
                 for (Vertex current : vertexes) {
@@ -105,6 +110,14 @@ public class GraphBuilder extends JFrame {
                     }
                 }
                 edgeFlag = true;
+                component.setIcon(new ImageIcon("selectedVer.png"));
+                workPanel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        edgeFlag = false;
+                        edge.getStart().resetIcon();
+                    }
+                });
             } else {
                 for (Vertex current : vertexes) {
                     if (current.getNumber().compareTo(component.getText()) == 0) {
@@ -115,6 +128,7 @@ public class GraphBuilder extends JFrame {
                     }
                 }
                 edgeFlag = false;
+                edge.getStart().resetIcon();
                 workPanel.addEdge(edge);
                 saveState();
                 workPanel.validate();
@@ -142,13 +156,6 @@ public class GraphBuilder extends JFrame {
             for (Integer current : result) {
                 vertexes.get(current).changeIcon();
             }
-        }
-    }
-
-    public class EdgeUnFocusListener extends MouseAdapter {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            edgeFlag = false;
         }
     }
 

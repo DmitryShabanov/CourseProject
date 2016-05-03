@@ -38,7 +38,7 @@ public class Vertex implements Cloneable {
     }
 
     public void changeIcon() {
-        icon.setIcon(new ImageIcon("selectedVer.png"));
+        icon.setIcon(new ImageIcon("suitedVer.png"));
     }
 
     public String getNumber() {
