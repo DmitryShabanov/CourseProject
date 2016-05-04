@@ -9,23 +9,19 @@ public class History {
 
     private ArrayList<Memento> states = new ArrayList<>();
 
-    public void addState(Memento state) {
+    public void addState(Memento state, int index) {
+        if (index < states.size()) {
+            for (int i = states.size() - 1; i >= index; i--) {
+                states.remove(states.get(i));
+            }
+        }
         states.add(state);
     }
 
     public Memento getState(int index) {
+        if (index < 0 || index >= states.size()) {
+            return null;
+        }
         return states.get(index);
-    }
-
-    public Memento getNewestState() {
-        return states.get(states.size() - 1);
-    }
-
-    public void deleteState(Memento state) {
-        states.remove(state);
-    }
-
-    public void deleteState(int index) {
-        states.remove(index);
     }
 }

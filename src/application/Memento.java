@@ -26,7 +26,7 @@ public class Memento {
                     newEdge.setEnd(vertex);
                 }
             }
-            newEdge.setWeight(edge.getWeight());
+            newEdge.setWeight((Integer) edge.getWeight().getValue());
             this.edges.add(newEdge);
         }
     }

@@ -11,10 +11,19 @@ public class Vertex {
     private JLabel icon;
     private JPanel panel;
     private String number = "";
+    private boolean selected = false;
 
     public Vertex(JPanel panel) {
         icon = new JLabel(new ImageIcon("ver.png"));
         this.panel = panel;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public Point getLocation() {
@@ -26,9 +35,6 @@ public class Vertex {
     }
 
     public void draw() {
-        DragListener drag = new DragListener(panel);
-        icon.addMouseListener(drag);
-        icon.addMouseMotionListener(drag);
         panel.add(icon);
         panel.validate();
     }

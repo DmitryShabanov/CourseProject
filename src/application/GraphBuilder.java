@@ -24,21 +24,33 @@ public class GraphBuilder extends JFrame {
 
     private JTextArea historyArea = new JTextArea(10, 0);
     private History history = new History();
+    private int currentState = -1;
 
     public GraphBuilder() throws HeadlessException {
         super("Graph Builder");
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(1350, 800);
+        //setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setResizable(false);
 
-        addMenu();
+        //addMenu();
         addToolBar();
         add(workPanel);
         addHistory();
 
+        saveState();
+
+        workPanel.addKeyListener(new MyKeyListener());
+        setFocus();
+
         setVisible(true);
+    }
+
+    private void setFocus() {
+        workPanel.setFocusable(true);
+        workPanel.requestFocusInWindow();
     }
 
     private void saveVertexLocation() {
@@ -52,22 +64,24 @@ public class GraphBuilder extends JFrame {
 
     private void saveState() {
         Memento state = new Memento(vertexes, workPanel.getEdges());
-        history.addState(state);
+        currentState++;
+        history.addState(state, currentState);
     }
 
-    private void loadState() {
+    private boolean loadState(int index) {
         clearState();
-        Memento state = history.getNewestState();
+        Memento state = history.getState(index);
+        if (state == null) {
+            return false;
+        }
         vertexes = state.getVertexes();
         for (Vertex current : vertexes) {
             addVertex(current);
         }
-
         ArrayList<Edge> edges = state.getEdges();
-
         for (Edge edge : edges) {
             Edge newEdge = new Edge();
-            for (Vertex vertex: this.vertexes) {
+            for (Vertex vertex : this.vertexes) {
                 if (vertex.getNumber().compareTo(edge.getStart().getNumber()) == 0) {
                     newEdge.setStart(vertex);
                 }
@@ -82,6 +96,7 @@ public class GraphBuilder extends JFrame {
         saveVertexLocation();
         workPanel.validate();
         rePaint();
+        return true;
     }
 
     private void clearState() {
@@ -142,28 +157,47 @@ public class GraphBuilder extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearState();
+                setFocus();
             }
         });
         toolBar.add(clear);
 
-        JButton b1 = new JButton("save");
-        JButton b2 = new JButton("load");
-        toolBar.add(b1);
+        JButton b1 = new JButton(new ImageIcon("forwardButton.png"));
+        JButton b2 = new JButton(new ImageIcon("backButton.png"));
+        b1.setMaximumSize(new Dimension(30, 30));
+        b2.setMaximumSize(new Dimension(30, 30));
         toolBar.add(b2);
+        toolBar.add(b1);
         b1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                saveState();
+                ctrlY();
+                setFocus();
             }
         });
         b2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loadState();
+                ctrlZ();
+                setFocus();
             }
         });
 
         this.add(toolBar, BorderLayout.NORTH);
+    }
+
+    private void ctrlY() {
+        if (loadState(currentState + 1)) {
+            currentState++;
+        }
+        loadState(currentState);
+    }
+
+    private void ctrlZ() {
+        if (loadState(currentState - 1)) {
+            currentState--;
+        }
+        loadState(currentState);
     }
 
     private void addMenu() {
@@ -188,21 +222,108 @@ public class GraphBuilder extends JFrame {
         vertex.getIcon().addMouseMotionListener(edgeListener);
         saveVertexLocation();
         vertex.draw();
+        DragListener drag = new DragListener();
+        vertex.getIcon().addMouseListener(drag);
+        vertex.getIcon().addMouseMotionListener(drag);
         rePaint();
+    }
+
+    private void addNewVer() {
+        for (Vertex current : vertexes) {
+            current.resetIcon();
+        }
+        Vertex newVer = new Vertex(workPanel);
+        newVer.setNumber(vertexes.size());
+        addVertex(newVer);
+        vertexes.add(newVer);
+        saveState();
+    }
+
+    private void deleteVertex() {
+        for (Vertex current : vertexes) {
+            if (current.isSelected()) {
+                workPanel.remove(current.getIcon());
+                saveVertexLocation();
+                workPanel.validate();
+                workPanel.repaint();
+                rePaint();
+                vertexes.remove(current);
+            }
+        }
     }
 
     public class AddVertexListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (Vertex current : vertexes) {
-                current.resetIcon();
-            }
-            Vertex newVer = new Vertex(workPanel);
-            newVer.setNumber(vertexes.size());
-            addVertex(newVer);
-            vertexes.add(newVer);
+            addNewVer();
+            setFocus();
         }
     }
+
+    public class DragListener extends MouseInputAdapter {
+        private Point location;
+        private MouseEvent pressed;
+        private int oldX = 0;
+        private int oldY = 0;
+
+        @Override
+
+        public void mousePressed(MouseEvent e) {
+            pressed = e;
+            oldX = e.getComponent().getX();
+            oldY = e.getComponent().getY();
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            Component component = e.getComponent();
+            location = component.getLocation(location);
+            int x = location.x - pressed.getX() + e.getX();
+            int y = location.y - pressed.getY() + e.getY();
+            if (x + component.getWidth() > workPanel.getWidth() + workPanel.getX() || x < 0) {
+                return;
+            }
+            if (y + component.getHeight() > workPanel.getHeight() || y < 0) {
+                return;
+            }
+            component.setLocation(x, y);
+            workPanel.repaint();
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (oldX != e.getComponent().getX() && oldY != e.getComponent().getY()) {
+                saveState();
+            }
+        }
+    }
+
+    private class MyKeyListener extends KeyAdapter {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            //back
+            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z) {
+                ctrlZ();
+            }
+            //forward
+            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Y) {
+                ctrlY();
+            }
+            //add new vertex
+            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V) {
+                addNewVer();
+            }
+            //clear workPanel
+            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_C) {
+                clearState();
+            }
+            //delete vertex
+            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V) {
+                deleteVertex();
+            }
+        }
+    }
+
 
     public class AddEdgeListener extends MouseInputAdapter {
         @Override
@@ -210,6 +331,7 @@ public class GraphBuilder extends JFrame {
             JLabel component = (JLabel) e.getComponent();
             for (Vertex current : vertexes) {
                 current.resetIcon();
+                current.setSelected(false);
             }
             if (!edgeFlag) {
                 edge = new Edge();
@@ -220,14 +342,20 @@ public class GraphBuilder extends JFrame {
                 }
                 edgeFlag = true;
                 component.setIcon(new ImageIcon("selectedVer.png"));
+                edge.getStart().setSelected(true);
                 workPanel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         edgeFlag = false;
                         edge.getStart().resetIcon();
+                        edge.getStart().setSelected(false);
                     }
                 });
             } else {
+                if (edge.getStart() == null) {
+                    edgeFlag = false;
+                    return;
+                }
                 for (Vertex current : vertexes) {
                     if (current.getNumber().compareTo(component.getText()) == 0) {
                         if (component.getX() == edge.getStart().getLocation().getX() && component.getY() == edge.getStart().getLocation().getY()) {
@@ -242,7 +370,10 @@ public class GraphBuilder extends JFrame {
                 saveVertexLocation();
                 workPanel.validate();
                 rePaint();
+                saveState();
+                setFocus();
             }
+            setFocus();
         }
     }
 
@@ -265,6 +396,7 @@ public class GraphBuilder extends JFrame {
             for (Integer current : result) {
                 vertexes.get(current).changeIcon();
             }
+            setFocus();
         }
     }
 }
