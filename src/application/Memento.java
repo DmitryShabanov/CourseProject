@@ -9,10 +9,15 @@ public class Memento {
 
     private ArrayList<Vertex> vertexes;
     private ArrayList<Edge> edges;
+    private ArrayList<String> historyLog;
 
-    public Memento(ArrayList<Vertex> vertexes, ArrayList<Edge> edges) {
+    public Memento(ArrayList<Vertex> vertexes, ArrayList<Edge> edges, ArrayList<String> historyLog) {
         this.vertexes = new ArrayList<>();
         this.edges = new ArrayList<>();
+        this.historyLog = new ArrayList<>();
+        for (String str : historyLog) {
+            this.historyLog.add(str);
+        }
         for (Vertex current : vertexes) {
             this.vertexes.add(current.copy());
         }
@@ -45,5 +50,9 @@ public class Memento {
             newEdges.add(current.copy());
         }
         return newEdges;
+    }
+
+    public ArrayList<String> getHistoryLog() {
+        return historyLog;
     }
 }

@@ -24,7 +24,7 @@ public class GraphBuilder extends JFrame {
 
     private DefaultListModel historyModel = new DefaultListModel();
     private JList historyList = new JList(historyModel);
-    private JScrollPane historyScrolPane = new JScrollPane(historyList);
+    private JScrollPane historyScrollPane = new JScrollPane(historyList);
     private History history = new History();
     private int currentState = -1;
 
@@ -67,7 +67,11 @@ public class GraphBuilder extends JFrame {
     }
 
     private void saveState() {
-        Memento state = new Memento(vertexes, workPanel.getEdges());
+        ArrayList<String> historyLog = new ArrayList<>();
+        for (int i = 0; i < historyModel.size(); i++) {
+            historyLog.add((String) historyModel.get(i));
+        }
+        Memento state = new Memento(vertexes, workPanel.getEdges(), historyLog);
         currentState++;
         history.addState(state, currentState);
     }
@@ -78,6 +82,9 @@ public class GraphBuilder extends JFrame {
         Memento state = history.getState(index);
         if (state == null) {
             return false;
+        }
+        for (String log : state.getHistoryLog()) {
+            historyModel.addElement(log);
         }
         vertexes = state.getVertexes();
         for (Vertex current : vertexes) {
@@ -96,9 +103,7 @@ public class GraphBuilder extends JFrame {
             }
             newEdge.setWeight(edge.getWeight());
             workPanel.addEdge(newEdge);
-            historyModel.add(0, "Добавлено новое ребро: от вершины " + edge.getStart().getNumber() + " к вершине " + edge.getEnd().getNumber());
         }
-
         saveVertexLocation();
         workPanel.validate();
         rePaint();
@@ -210,8 +215,8 @@ public class GraphBuilder extends JFrame {
     }
 
     private void addHistory() {
-        historyScrolPane.setPreferredSize(new Dimension(this.getWidth(), 100));
-        this.add(historyScrolPane, BorderLayout.SOUTH);
+        historyScrollPane.setPreferredSize(new Dimension(this.getWidth(), 100));
+        this.add(historyScrollPane, BorderLayout.SOUTH);
         historyList.setLayoutOrientation(JList.VERTICAL);
     }
 
@@ -225,7 +230,6 @@ public class GraphBuilder extends JFrame {
         vertex.getIcon().addMouseListener(drag);
         vertex.getIcon().addMouseMotionListener(drag);
         rePaint();
-        historyModel.add(0, "Добавлена новая вершина: " + vertex.getNumber());
     }
 
     private void addNewVer() {
@@ -242,6 +246,7 @@ public class GraphBuilder extends JFrame {
         }
         addVertex(newVer);
         vertexes.add(newVer);
+        historyModel.add(0, "Добавлена новая вершина: " + newVer.getNumber());
         saveState();
     }
 
@@ -283,8 +288,8 @@ public class GraphBuilder extends JFrame {
                 rePaint();
                 select = "";
                 edgeFlag = false;
-                saveState();
                 historyModel.add(0, "Удалена вершина: " + vertex.getNumber());
+                saveState();
                 return;
             }
         }
@@ -380,9 +385,9 @@ public class GraphBuilder extends JFrame {
                 saveVertexLocation();
                 workPanel.validate();
                 rePaint();
+                historyModel.add(0, "Добавлено новое ребро: от вершины " + edge.getStart().getNumber() + " к вершине " + edge.getEnd().getNumber());
                 saveState();
                 setFocus();
-                historyModel.add(0, "Добавлено новое ребро: от вершины " + edge.getStart().getNumber() + " к вершине " + edge.getEnd().getNumber());
             }
             setFocus();
         }
