@@ -11,19 +11,10 @@ public class Vertex {
     private JLabel icon;
     private JPanel panel;
     private String number = "";
-    private boolean selected = false;
 
     public Vertex(JPanel panel) {
         icon = new JLabel(new ImageIcon("ver.png"));
         this.panel = panel;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
     }
 
     public Point getLocation() {
@@ -61,10 +52,6 @@ public class Vertex {
 
     public JLabel getIcon() {
         return icon;
-    }
-
-    public void setIcon(JLabel icon) {
-        this.icon = icon;
     }
 
     public void setNumber(int number) {

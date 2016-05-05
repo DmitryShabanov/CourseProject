@@ -26,6 +26,9 @@ public class GraphBuilder extends JFrame {
     private History history = new History();
     private int currentState = -1;
 
+    private String select = "";
+    private ArrayList<String> numbers = new ArrayList<>();
+
     public GraphBuilder() throws HeadlessException {
         super("Graph Builder");
         pack();
@@ -157,6 +160,7 @@ public class GraphBuilder extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearState();
+                saveState();
                 setFocus();
             }
         });
@@ -233,21 +237,58 @@ public class GraphBuilder extends JFrame {
             current.resetIcon();
         }
         Vertex newVer = new Vertex(workPanel);
-        newVer.setNumber(vertexes.size());
+        if (!numbers.isEmpty()) {
+            sortNumbers();
+            newVer.setNumber(Integer.valueOf(numbers.get(0)));
+            numbers.remove(0);
+        } else {
+            newVer.setNumber(vertexes.size());
+        }
         addVertex(newVer);
         vertexes.add(newVer);
         saveState();
     }
 
+    private void sortNumbers() {
+        boolean isSwapped = true;
+        while (isSwapped) {
+            isSwapped = false;
+            for (int j = 1; j < numbers.size(); j++) {
+                if (Integer.valueOf(numbers.get(j - 1)) > Integer.valueOf(numbers.get(j))) {
+                    numbers.add(j - 1, numbers.get(j));
+                    numbers.remove(j + 1);
+                    isSwapped = true;
+                }
+            }
+        }
+    }
+
     private void deleteVertex() {
-        for (Vertex current : vertexes) {
-            if (current.isSelected()) {
-                workPanel.remove(current.getIcon());
+        for (Vertex vertex : vertexes) {
+            if (vertex.getNumber().compareTo(select) == 0) {
+                boolean isDelete = true;
+                while (isDelete) {
+                    isDelete = false;
+                    for (Edge edge : workPanel.getEdges()) {
+                        if (edge.getStart().equals(vertex) || edge.getEnd().equals(vertex)) {
+                            workPanel.remove(edge.getWeight());
+                            workPanel.getEdges().remove(edge);
+                            isDelete = true;
+                            break;
+                        }
+                    }
+                }
+                workPanel.remove(vertex.getIcon());
+                numbers.add(vertex.getNumber());
+                vertexes.remove(vertex);
                 saveVertexLocation();
                 workPanel.validate();
                 workPanel.repaint();
                 rePaint();
-                vertexes.remove(current);
+                select = "";
+                edgeFlag = false;
+                saveState();
+                return;
             }
         }
     }
@@ -267,7 +308,6 @@ public class GraphBuilder extends JFrame {
         private int oldY = 0;
 
         @Override
-
         public void mousePressed(MouseEvent e) {
             pressed = e;
             oldX = e.getComponent().getX();
@@ -298,6 +338,58 @@ public class GraphBuilder extends JFrame {
         }
     }
 
+    public class AddEdgeListener extends MouseInputAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            JLabel component = (JLabel) e.getComponent();
+            for (Vertex current : vertexes) {
+                current.resetIcon();
+            }
+            if (!edgeFlag) {
+                edge = new Edge();
+                for (Vertex current : vertexes) {
+                    if (current.getNumber().compareTo(component.getText()) == 0) {
+                        edge.setStart(current);
+                        select = current.getNumber();
+                    }
+                }
+                edgeFlag = true;
+                component.setIcon(new ImageIcon("selectedVer.png"));
+                workPanel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        edgeFlag = false;
+                        edge.getStart().resetIcon();
+                        select = "";
+                    }
+                });
+            } else {
+                if (edge.getStart() == null) {
+                    edgeFlag = false;
+                    return;
+                }
+                for (Vertex current : vertexes) {
+                    if (current.getNumber().compareTo(component.getText()) == 0) {
+                        if (component.getX() == edge.getStart().getLocation().getX() && component.getY() == edge.getStart().getLocation().getY()) {
+                            return;
+                        }
+                        edge.setEnd(current);
+                    }
+                }
+                edgeFlag = false;
+                edge.getStart().resetIcon();
+                select = "";
+                workPanel.addEdge(edge);
+                saveVertexLocation();
+                workPanel.validate();
+                rePaint();
+                saveState();
+                setFocus();
+            }
+            setFocus();
+        }
+    }
+
     private class MyKeyListener extends KeyAdapter {
         @Override
         public void keyReleased(KeyEvent e) {
@@ -316,64 +408,12 @@ public class GraphBuilder extends JFrame {
             //clear workPanel
             if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_C) {
                 clearState();
+                saveState();
             }
             //delete vertex
-            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V) {
+            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_X) {
                 deleteVertex();
             }
-        }
-    }
-
-
-    public class AddEdgeListener extends MouseInputAdapter {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            JLabel component = (JLabel) e.getComponent();
-            for (Vertex current : vertexes) {
-                current.resetIcon();
-                current.setSelected(false);
-            }
-            if (!edgeFlag) {
-                edge = new Edge();
-                for (Vertex current : vertexes) {
-                    if (current.getNumber().compareTo(component.getText()) == 0) {
-                        edge.setStart(current);
-                    }
-                }
-                edgeFlag = true;
-                component.setIcon(new ImageIcon("selectedVer.png"));
-                edge.getStart().setSelected(true);
-                workPanel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        edgeFlag = false;
-                        edge.getStart().resetIcon();
-                        edge.getStart().setSelected(false);
-                    }
-                });
-            } else {
-                if (edge.getStart() == null) {
-                    edgeFlag = false;
-                    return;
-                }
-                for (Vertex current : vertexes) {
-                    if (current.getNumber().compareTo(component.getText()) == 0) {
-                        if (component.getX() == edge.getStart().getLocation().getX() && component.getY() == edge.getStart().getLocation().getY()) {
-                            return;
-                        }
-                        edge.setEnd(current);
-                    }
-                }
-                edgeFlag = false;
-                edge.getStart().resetIcon();
-                workPanel.addEdge(edge);
-                saveVertexLocation();
-                workPanel.validate();
-                rePaint();
-                saveState();
-                setFocus();
-            }
-            setFocus();
         }
     }
 
