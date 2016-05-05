@@ -22,7 +22,9 @@ public class GraphBuilder extends JFrame {
     private JFormattedTextField finish = new JFormattedTextField(0);
     private JTextField resultField = new JTextField();
 
-    private JTextArea historyArea = new JTextArea(10, 0);
+    private DefaultListModel historyModel = new DefaultListModel();
+    private JList historyList = new JList(historyModel);
+    private JScrollPane historyScrolPane = new JScrollPane(historyList);
     private History history = new History();
     private int currentState = -1;
 
@@ -38,7 +40,6 @@ public class GraphBuilder extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        //addMenu();
         addToolBar();
         add(workPanel);
         addHistory();
@@ -73,6 +74,7 @@ public class GraphBuilder extends JFrame {
 
     private boolean loadState(int index) {
         clearState();
+        historyModel.removeAllElements();
         Memento state = history.getState(index);
         if (state == null) {
             return false;
@@ -94,6 +96,7 @@ public class GraphBuilder extends JFrame {
             }
             newEdge.setWeight(edge.getWeight());
             workPanel.addEdge(newEdge);
+            historyModel.add(0, "Добавлено новое ребро: от вершины " + edge.getStart().getNumber() + " к вершине " + edge.getEnd().getNumber());
         }
 
         saveVertexLocation();
@@ -110,6 +113,8 @@ public class GraphBuilder extends JFrame {
         workPanel.removeAll();
         workPanel.validate();
         workPanel.repaint();
+        historyModel.removeAllElements();
+        historyModel.add(0, "Рабочее пространство очищено");
     }
 
     private void rePaint() {
@@ -134,8 +139,8 @@ public class GraphBuilder extends JFrame {
 
     private void addToolBar() {
         JToolBar toolBar = new JToolBar();
-        JButton addVer = new JButton("Вершина");
-        JButton calculateWay = new JButton("Путь");
+        JButton addVer = new JButton("Добавить вершину");
+        JButton calculateWay = new JButton("Найти путь");
 
         addVer.addActionListener(new AddVertexListener());
         calculateWay.addActionListener(new WayListener());
@@ -204,20 +209,10 @@ public class GraphBuilder extends JFrame {
         loadState(currentState);
     }
 
-    private void addMenu() {
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Меню");
-        JMenuItem menuItem = new JMenuItem("Добавить вершину");
-
-        menu.add(menuItem);
-        menuBar.add(menu);
-        this.setJMenuBar(menuBar);
-    }
-
     private void addHistory() {
-        this.add(historyArea, BorderLayout.SOUTH);
-        historyArea.setEditable(false);
-        historyArea.setBackground(Color.LIGHT_GRAY);
+        historyScrolPane.setPreferredSize(new Dimension(this.getWidth(), 100));
+        this.add(historyScrolPane, BorderLayout.SOUTH);
+        historyList.setLayoutOrientation(JList.VERTICAL);
     }
 
     private void addVertex(Vertex vertex) {
@@ -230,6 +225,7 @@ public class GraphBuilder extends JFrame {
         vertex.getIcon().addMouseListener(drag);
         vertex.getIcon().addMouseMotionListener(drag);
         rePaint();
+        historyModel.add(0, "Добавлена новая вершина: " + vertex.getNumber());
     }
 
     private void addNewVer() {
@@ -288,6 +284,7 @@ public class GraphBuilder extends JFrame {
                 select = "";
                 edgeFlag = false;
                 saveState();
+                historyModel.add(0, "Удалена вершина: " + vertex.getNumber());
                 return;
             }
         }
@@ -385,6 +382,7 @@ public class GraphBuilder extends JFrame {
                 rePaint();
                 saveState();
                 setFocus();
+                historyModel.add(0, "Добавлено новое ребро: от вершины " + edge.getStart().getNumber() + " к вершине " + edge.getEnd().getNumber());
             }
             setFocus();
         }
