@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Created by dmitry on 15.04.16.
  */
-public class Vertex {
+public class Vertex implements Cloneable, MyComponent {
 
     private JLabel icon;
     private JPanel panel;
@@ -28,14 +28,6 @@ public class Vertex {
     public void draw() {
         panel.add(icon);
         panel.validate();
-    }
-
-    public void resetIcon() {
-        icon.setIcon(new ImageIcon("ver.png"));
-    }
-
-    public void changeIcon() {
-        icon.setIcon(new ImageIcon("suitedVer.png"));
     }
 
     public String getNumber() {
@@ -65,7 +57,7 @@ public class Vertex {
         return vertex.getCenterX() == getCenterX() && vertex.getCenterY() == getCenterY() && vertex.getNumber().compareTo(number) == 0;
     }
 
-    public Vertex copy() {
+    public Vertex clone() {
         Vertex clone = new Vertex(panel);
         clone.setNumber(Integer.valueOf(number));
         clone.setLocation(getLocation());

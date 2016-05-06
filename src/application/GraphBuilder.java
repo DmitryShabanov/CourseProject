@@ -153,9 +153,7 @@ public class GraphBuilder extends JFrame {
         finish.setColumns(2);
 
         toolBar.add(addVer);
-        toolBar.add(calculateWay);
         toolBar.add(new JLabel(" Начальная вершина:  "));
-
         toolBar.add(start);
         start.setMaximumSize(new Dimension(30, 20));
         toolBar.add(new JLabel(" Конечная вершина:  "));
@@ -165,6 +163,7 @@ public class GraphBuilder extends JFrame {
         toolBar.add(resultField);
         resultField.setMaximumSize(new Dimension(140, 20));
         resultField.setEditable(false);
+        toolBar.add(calculateWay);
         JButton clear = new JButton("Очистить");
         clear.addActionListener(new ActionListener() {
             @Override
@@ -234,7 +233,8 @@ public class GraphBuilder extends JFrame {
 
     private void addNewVer() {
         for (Vertex current : vertexes) {
-            current.resetIcon();
+            MyComponent decorator = new ResetDecorator(current);
+            decorator.draw();
         }
         Vertex newVer = new Vertex(workPanel);
         if (!numbers.isEmpty()) {
@@ -317,6 +317,24 @@ public class GraphBuilder extends JFrame {
         }
 
         @Override
+        public void mouseEntered(MouseEvent e) {
+            JLabel label = (JLabel) e.getComponent();
+            if (select.compareTo(label.getText()) != 0) {
+                MyComponent decorator = new HoverDecorator(vertexes.get(Integer.valueOf(label.getText())));
+                decorator.draw();
+            }
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            JLabel label = (JLabel) e.getComponent();
+            if (select.compareTo(label.getText()) != 0) {
+                MyComponent decorator = new ResetDecorator(vertexes.get(Integer.valueOf(label.getText())));
+                decorator.draw();
+            }
+        }
+
+        @Override
         public void mouseDragged(MouseEvent e) {
             Component component = e.getComponent();
             location = component.getLocation(location);
@@ -345,7 +363,8 @@ public class GraphBuilder extends JFrame {
         public void mouseClicked(MouseEvent e) {
             JLabel component = (JLabel) e.getComponent();
             for (Vertex current : vertexes) {
-                current.resetIcon();
+                MyComponent decorator = new ResetDecorator(current);
+                decorator.draw();
             }
             if (!edgeFlag) {
                 edge = new Edge();
@@ -353,15 +372,17 @@ public class GraphBuilder extends JFrame {
                     if (current.getNumber().compareTo(component.getText()) == 0) {
                         edge.setStart(current);
                         select = current.getNumber();
+                        MyComponent decorator = new SelectedDecorator(current);
+                        decorator.draw();
                     }
                 }
                 edgeFlag = true;
-                component.setIcon(new ImageIcon("selectedVer.png"));
                 workPanel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         edgeFlag = false;
-                        edge.getStart().resetIcon();
+                        MyComponent decorator = new ResetDecorator(edge.getStart());
+                        decorator.draw();
                         select = "";
                     }
                 });
@@ -379,7 +400,8 @@ public class GraphBuilder extends JFrame {
                     }
                 }
                 edgeFlag = false;
-                edge.getStart().resetIcon();
+                MyComponent decorator = new ResetDecorator(edge.getStart());
+                decorator.draw();
                 select = "";
                 workPanel.addEdge(edge);
                 saveVertexLocation();
@@ -424,20 +446,24 @@ public class GraphBuilder extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             for (Vertex vertex : vertexes) {
-                vertex.resetIcon();
+                MyComponent decorator = new ResetDecorator(vertex);
+                decorator.draw();
             }
             validWay(start);
             validWay(finish);
             if (vertexes.size() == 0) {
+                setFocus();
                 return;
             }
             if ((int) start.getValue() == (int) finish.getValue()) {
                 resultField.setText("не существует!");
+                setFocus();
                 return;
             }
             ArrayList<Integer> result = workPanel.getShortestWay(vertexes.size(), (int) start.getValue(), (int) finish.getValue(), resultField);
             for (Integer current : result) {
-                vertexes.get(current).changeIcon();
+                MyComponent decorator = new SuitedDecorator(vertexes.get(current));
+                decorator.draw();
             }
             setFocus();
         }

@@ -5,7 +5,7 @@ import javax.swing.*;
 /**
  * Created by dmitry on 28.04.16.
  */
-public class Edge {
+public class Edge implements Cloneable {
 
     private Vertex start, end;
     private JFormattedTextField weight;
@@ -69,10 +69,10 @@ public class Edge {
         return edge.getEnd().equals(start) && edge.getStart().equals(end);
     }
 
-    public Edge copy() {
+    public Edge clone() {
         Edge clone = new Edge();
-        clone.setStart(start.copy());
-        clone.setEnd(end.copy());
+        clone.setStart(start.clone());
+        clone.setEnd(end.clone());
         clone.setWeight((Integer) weight.getValue());
         return clone;
     }

@@ -19,7 +19,7 @@ public class Memento {
             this.historyLog.add(str);
         }
         for (Vertex current : vertexes) {
-            this.vertexes.add(current.copy());
+            this.vertexes.add(current.clone());
         }
         for (Edge edge : edges) {
             Edge newEdge = new Edge();
@@ -39,7 +39,7 @@ public class Memento {
     public ArrayList<Vertex> getVertexes() {
         ArrayList<Vertex> newVer = new ArrayList<>();
         for (Vertex current : vertexes) {
-            newVer.add(current.copy());
+            newVer.add(current.clone());
         }
         return newVer;
     }
@@ -47,7 +47,7 @@ public class Memento {
     public ArrayList<Edge> getEdges() {
         ArrayList<Edge> newEdges = new ArrayList<>();
         for (Edge current : edges) {
-            newEdges.add(current.copy());
+            newEdges.add(current.clone());
         }
         return newEdges;
     }
