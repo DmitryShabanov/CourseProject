@@ -47,6 +47,18 @@ public class GraphBuilder extends JFrame {
         saveState();
 
         workPanel.addKeyListener(new MyKeyListener());
+        workPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (select.compareTo("") != 0) {
+                    edgeFlag = false;
+                    MyComponent decorator = new ResetDecorator(edge.getStart());
+                    decorator.draw();
+                    select = "";
+                }
+                setFocus();
+            }
+        });
         setFocus();
 
         setVisible(true);
@@ -119,6 +131,8 @@ public class GraphBuilder extends JFrame {
         workPanel.validate();
         workPanel.repaint();
         historyModel.removeAllElements();
+        start.setValue(0);
+        finish.setValue(0);
         historyModel.add(0, "Рабочее пространство очищено");
     }
 
@@ -232,10 +246,7 @@ public class GraphBuilder extends JFrame {
     }
 
     private void addNewVer() {
-        for (Vertex current : vertexes) {
-            MyComponent decorator = new ResetDecorator(current);
-            decorator.draw();
-        }
+        clearVertexes();
         Vertex newVer = new Vertex(workPanel);
         if (!numbers.isEmpty()) {
             sortNumbers();
@@ -358,14 +369,18 @@ public class GraphBuilder extends JFrame {
         }
     }
 
+    private void clearVertexes() {
+        for (Vertex current : vertexes) {
+            MyComponent decorator = new ResetDecorator(current);
+            decorator.draw();
+        }
+    }
+
     public class AddEdgeListener extends MouseInputAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
             JLabel component = (JLabel) e.getComponent();
-            for (Vertex current : vertexes) {
-                MyComponent decorator = new ResetDecorator(current);
-                decorator.draw();
-            }
+            clearVertexes();
             if (!edgeFlag) {
                 edge = new Edge();
                 for (Vertex current : vertexes) {
@@ -377,15 +392,6 @@ public class GraphBuilder extends JFrame {
                     }
                 }
                 edgeFlag = true;
-                workPanel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        edgeFlag = false;
-                        MyComponent decorator = new ResetDecorator(edge.getStart());
-                        decorator.draw();
-                        select = "";
-                    }
-                });
             } else {
                 if (edge.getStart() == null) {
                     edgeFlag = false;
@@ -404,6 +410,14 @@ public class GraphBuilder extends JFrame {
                 decorator.draw();
                 select = "";
                 workPanel.addEdge(edge);
+                /*edge.getWeight().addFocusListener(new FocusAdapter() {
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        JFormattedTextField field = (JFormattedTextField) e.getComponent();
+                        clearVertexes();
+                        saveState();
+                    }
+                });*/
                 saveVertexLocation();
                 workPanel.validate();
                 rePaint();
@@ -445,10 +459,7 @@ public class GraphBuilder extends JFrame {
     public class WayListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (Vertex vertex : vertexes) {
-                MyComponent decorator = new ResetDecorator(vertex);
-                decorator.draw();
-            }
+            clearVertexes();
             validWay(start);
             validWay(finish);
             if (vertexes.size() == 0) {
