@@ -6,7 +6,6 @@ import application.GraphBuilder;
 public class Main {
 
     public static void main(String ... args) {
-        GraphBuilder frame = new GraphBuilder();
+        GraphBuilder frame = GraphBuilder.getInstance();
     }
-
 }

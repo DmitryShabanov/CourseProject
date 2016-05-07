@@ -1,7 +1,6 @@
 package application;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -11,27 +10,29 @@ import java.util.ArrayList;
  */
 public class GraphBuilder extends JFrame {
 
-    private WorkPanel workPanel = new WorkPanel();
-    private ArrayList<Vertex> vertexes = new ArrayList<>();
-    private ArrayList<Point> points = new ArrayList<>();
+    protected WorkPanel workPanel = new WorkPanel();
+    protected ArrayList<Vertex> vertexes = new ArrayList<>();
+    protected ArrayList<Point> points = new ArrayList<>();
 
-    private Edge edge;
-    private boolean edgeFlag = false;
+    protected Edge edge;
+    protected boolean edgeFlag = false;
 
-    private JFormattedTextField start = new JFormattedTextField(0);
-    private JFormattedTextField finish = new JFormattedTextField(0);
-    private JTextField resultField = new JTextField();
+    protected JFormattedTextField start = new JFormattedTextField(0);
+    protected JFormattedTextField finish = new JFormattedTextField(0);
+    protected JTextField resultField = new JTextField();
 
-    private DefaultListModel historyModel = new DefaultListModel();
-    private JList historyList = new JList(historyModel);
-    private JScrollPane historyScrollPane = new JScrollPane(historyList);
-    private History history = new History();
-    private int currentState = -1;
+    protected DefaultListModel historyModel = new DefaultListModel();
+    protected JList historyList = new JList(historyModel);
+    protected JScrollPane historyScrollPane = new JScrollPane(historyList);
+    protected History history = new History();
+    protected int currentState = -1;
 
-    private String select = "";
-    private ArrayList<String> numbers = new ArrayList<>();
+    protected String select = "";
+    protected ArrayList<String> numbers = new ArrayList<>();
 
-    public GraphBuilder() throws HeadlessException {
+    private static GraphBuilder instance;
+
+    private GraphBuilder() throws HeadlessException {
         super("Graph Builder");
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,12 +65,19 @@ public class GraphBuilder extends JFrame {
         setVisible(true);
     }
 
-    private void setFocus() {
+    public static GraphBuilder getInstance() {
+        if (instance == null) {
+            instance = new GraphBuilder();
+        }
+        return instance;
+    }
+
+    public void setFocus() {
         workPanel.setFocusable(true);
         workPanel.requestFocusInWindow();
     }
 
-    private void saveVertexLocation() {
+    public void saveVertexLocation() {
         points = new ArrayList<>();
         if (vertexes.size() > 0) {
             for (Vertex current : vertexes) {
@@ -78,7 +86,7 @@ public class GraphBuilder extends JFrame {
         }
     }
 
-    private void saveState() {
+    public void saveState() {
         ArrayList<String> historyLog = new ArrayList<>();
         for (int i = 0; i < historyModel.size(); i++) {
             historyLog.add((String) historyModel.get(i));
@@ -88,7 +96,7 @@ public class GraphBuilder extends JFrame {
         history.addState(state, currentState);
     }
 
-    private boolean loadState(int index) {
+    public boolean loadState(int index) {
         clearState();
         historyModel.removeAllElements();
         Memento state = history.getState(index);
@@ -122,7 +130,7 @@ public class GraphBuilder extends JFrame {
         return true;
     }
 
-    private void clearState() {
+    public void clearState() {
         points.clear();
         vertexes.clear();
         resultField.setText("");
@@ -136,7 +144,7 @@ public class GraphBuilder extends JFrame {
         historyModel.add(0, "Рабочее пространство очищено");
     }
 
-    private void rePaint() {
+    public void rePaint() {
         int counter = 0;
         for (Point current : points) {
             vertexes.get(counter).setLocation(current);
@@ -144,7 +152,7 @@ public class GraphBuilder extends JFrame {
         }
     }
 
-    private void validWay(JFormattedTextField tf) {
+    public void validWay(JFormattedTextField tf) {
         if (tf.getValue() == null) {
             tf.setValue(0);
         }
@@ -156,7 +164,7 @@ public class GraphBuilder extends JFrame {
         }
     }
 
-    private void addToolBar() {
+    public void addToolBar() {
         JToolBar toolBar = new JToolBar();
         JButton addVer = new JButton("Добавить вершину");
         JButton calculateWay = new JButton("Найти путь");
@@ -167,6 +175,8 @@ public class GraphBuilder extends JFrame {
         finish.setColumns(2);
 
         toolBar.add(addVer);
+        addVer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        calculateWay.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         toolBar.add(new JLabel(" Начальная вершина:  "));
         toolBar.add(start);
         start.setMaximumSize(new Dimension(30, 20));
@@ -179,6 +189,7 @@ public class GraphBuilder extends JFrame {
         resultField.setEditable(false);
         toolBar.add(calculateWay);
         JButton clear = new JButton("Очистить");
+        clear.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         clear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -191,6 +202,8 @@ public class GraphBuilder extends JFrame {
 
         JButton b1 = new JButton(new ImageIcon("forwardButton.png"));
         JButton b2 = new JButton(new ImageIcon("backButton.png"));
+        b1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         b1.setMaximumSize(new Dimension(30, 30));
         b2.setMaximumSize(new Dimension(30, 30));
         toolBar.add(b2);
@@ -213,27 +226,27 @@ public class GraphBuilder extends JFrame {
         this.add(toolBar, BorderLayout.NORTH);
     }
 
-    private void ctrlY() {
+    public void ctrlY() {
         if (loadState(currentState + 1)) {
             currentState++;
         }
         loadState(currentState);
     }
 
-    private void ctrlZ() {
+    public void ctrlZ() {
         if (loadState(currentState - 1)) {
             currentState--;
         }
         loadState(currentState);
     }
 
-    private void addHistory() {
+    public void addHistory() {
         historyScrollPane.setPreferredSize(new Dimension(this.getWidth(), 100));
         this.add(historyScrollPane, BorderLayout.SOUTH);
         historyList.setLayoutOrientation(JList.VERTICAL);
     }
 
-    private void addVertex(Vertex vertex) {
+    public void addVertex(Vertex vertex) {
         AddEdgeListener edgeListener = new AddEdgeListener();
         vertex.getIcon().addMouseListener(edgeListener);
         vertex.getIcon().addMouseMotionListener(edgeListener);
@@ -245,7 +258,7 @@ public class GraphBuilder extends JFrame {
         rePaint();
     }
 
-    private void addNewVer() {
+    public void addNewVer() {
         clearVertexes();
         Vertex newVer = new Vertex(workPanel);
         if (!numbers.isEmpty()) {
@@ -261,7 +274,7 @@ public class GraphBuilder extends JFrame {
         saveState();
     }
 
-    private void sortNumbers() {
+    public void sortNumbers() {
         boolean isSwapped = true;
         while (isSwapped) {
             isSwapped = false;
@@ -275,7 +288,14 @@ public class GraphBuilder extends JFrame {
         }
     }
 
-    private void deleteVertex() {
+    public void clearVertexes() {
+        for (Vertex current : vertexes) {
+            MyComponent decorator = new ResetDecorator(current);
+            decorator.draw();
+        }
+    }
+
+    public void deleteVertex() {
         for (Vertex vertex : vertexes) {
             if (vertex.getNumber().compareTo(select) == 0) {
                 boolean isDelete = true;
@@ -303,180 +323,6 @@ public class GraphBuilder extends JFrame {
                 saveState();
                 return;
             }
-        }
-    }
-
-    public class AddVertexListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            addNewVer();
-            setFocus();
-        }
-    }
-
-    public class DragListener extends MouseInputAdapter {
-        private Point location;
-        private MouseEvent pressed;
-        private int oldX = 0;
-        private int oldY = 0;
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            pressed = e;
-            oldX = e.getComponent().getX();
-            oldY = e.getComponent().getY();
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-            JLabel label = (JLabel) e.getComponent();
-            if (select.compareTo(label.getText()) != 0) {
-                MyComponent decorator = new HoverDecorator(vertexes.get(Integer.valueOf(label.getText())));
-                decorator.draw();
-            }
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            JLabel label = (JLabel) e.getComponent();
-            if (select.compareTo(label.getText()) != 0) {
-                MyComponent decorator = new ResetDecorator(vertexes.get(Integer.valueOf(label.getText())));
-                decorator.draw();
-            }
-        }
-
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            Component component = e.getComponent();
-            location = component.getLocation(location);
-            int x = location.x - pressed.getX() + e.getX();
-            int y = location.y - pressed.getY() + e.getY();
-            if (x + component.getWidth() > workPanel.getWidth() + workPanel.getX() || x < 0) {
-                return;
-            }
-            if (y + component.getHeight() > workPanel.getHeight() || y < 0) {
-                return;
-            }
-            component.setLocation(x, y);
-            workPanel.repaint();
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (oldX != e.getComponent().getX() && oldY != e.getComponent().getY()) {
-                saveState();
-            }
-        }
-    }
-
-    private void clearVertexes() {
-        for (Vertex current : vertexes) {
-            MyComponent decorator = new ResetDecorator(current);
-            decorator.draw();
-        }
-    }
-
-    public class AddEdgeListener extends MouseInputAdapter {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            JLabel component = (JLabel) e.getComponent();
-            clearVertexes();
-            if (!edgeFlag) {
-                edge = new Edge();
-                for (Vertex current : vertexes) {
-                    if (current.getNumber().compareTo(component.getText()) == 0) {
-                        edge.setStart(current);
-                        select = current.getNumber();
-                        MyComponent decorator = new SelectedDecorator(current);
-                        decorator.draw();
-                    }
-                }
-                edgeFlag = true;
-            } else {
-                if (edge.getStart() == null) {
-                    edgeFlag = false;
-                    return;
-                }
-                for (Vertex current : vertexes) {
-                    if (current.getNumber().compareTo(component.getText()) == 0) {
-                        if (component.getX() == edge.getStart().getLocation().getX() && component.getY() == edge.getStart().getLocation().getY()) {
-                            return;
-                        }
-                        edge.setEnd(current);
-                    }
-                }
-                edgeFlag = false;
-                MyComponent decorator = new ResetDecorator(edge.getStart());
-                decorator.draw();
-                select = "";
-                workPanel.addEdge(edge);
-                /*edge.getWeight().addFocusListener(new FocusAdapter() {
-                    @Override
-                    public void focusLost(FocusEvent e) {
-                        JFormattedTextField field = (JFormattedTextField) e.getComponent();
-                        clearVertexes();
-                        saveState();
-                    }
-                });*/
-                saveVertexLocation();
-                workPanel.validate();
-                rePaint();
-                historyModel.add(0, "Добавлено новое ребро: от вершины " + edge.getStart().getNumber() + " к вершине " + edge.getEnd().getNumber());
-                saveState();
-                setFocus();
-            }
-            setFocus();
-        }
-    }
-
-    private class MyKeyListener extends KeyAdapter {
-        @Override
-        public void keyReleased(KeyEvent e) {
-            //back
-            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z) {
-                ctrlZ();
-            }
-            //forward
-            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Y) {
-                ctrlY();
-            }
-            //add new vertex
-            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_V) {
-                addNewVer();
-            }
-            //clear workPanel
-            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_C) {
-                clearState();
-                saveState();
-            }
-            //delete vertex
-            if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_X) {
-                deleteVertex();
-            }
-        }
-    }
-
-    public class WayListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            clearVertexes();
-            validWay(start);
-            validWay(finish);
-            if (vertexes.size() == 0) {
-                setFocus();
-                return;
-            }
-            if ((int) start.getValue() == (int) finish.getValue()) {
-                resultField.setText("не существует!");
-                setFocus();
-                return;
-            }
-            ArrayList<Integer> result = workPanel.getShortestWay(vertexes.size(), (int) start.getValue(), (int) finish.getValue(), resultField);
-            for (Integer current : result) {
-                MyComponent decorator = new SuitedDecorator(vertexes.get(current));
-                decorator.draw();
-            }
-            setFocus();
         }
     }
 }
