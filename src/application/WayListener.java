@@ -23,14 +23,14 @@ public class WayListener implements ActionListener {
             gb.setFocus();
             return;
         }
-        int size = 0;
+        int max = 0;
         for (Vertex vertex : gb.vertexes) {
-            if (size < Integer.valueOf(vertex.getNumber())) {
-                size = Integer.valueOf(vertex.getNumber());
+            if (max < Integer.valueOf(vertex.getNumber())) {
+                max = Integer.valueOf(vertex.getNumber());
             }
         }
-        size++;
-        ArrayList<Integer> result = gb.workPanel.getShortestWay(size, (int) gb.start.getValue(), (int) gb.finish.getValue(), gb.resultField);
+        max = max + 1;
+        ArrayList<Integer> result = gb.workPanel.getShortestWay(max, (int) gb.start.getValue(), (int) gb.finish.getValue(), gb.resultField);
         for (Vertex vertex : gb.vertexes) {
             for (Integer current : result) {
                 if (Integer.valueOf(vertex.getNumber()) == (int) current) {

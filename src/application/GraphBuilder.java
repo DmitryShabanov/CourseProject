@@ -159,9 +159,6 @@ public class GraphBuilder extends JFrame {
         if ((Integer) tf.getValue() < 0) {
             tf.setValue(Math.abs((Integer) tf.getValue()));
         }
-        if ((Integer) tf.getValue() > vertexes.size() - 1) {
-            tf.setValue(0);
-        }
     }
 
     public void addToolBar() {
