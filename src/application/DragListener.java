@@ -76,6 +76,7 @@ public class DragListener extends MouseInputAdapter {
     public void mouseReleased(MouseEvent e) {
         if (oldX != e.getComponent().getX() && oldY != e.getComponent().getY()) {
             GraphBuilder.getInstance().saveState();
+            GraphBuilder.getInstance().saveVertexLocation();
         }
     }
 }

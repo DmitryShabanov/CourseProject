@@ -14,6 +14,6 @@ public class SelectedDecorator extends VertexDecorator {
     @Override
     public void draw() {
         Vertex ver = (Vertex) vertex;
-        ver.getIcon().setIcon(new ImageIcon("selectedVer.png"));
+        ver.getIcon().setIcon(new ImageIcon("images/selectedVer.png"));
     }
 }

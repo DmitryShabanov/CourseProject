@@ -14,6 +14,6 @@ public class ResetDecorator extends VertexDecorator {
     @Override
     public void draw() {
         Vertex ver = (Vertex) vertex;
-        ver.getIcon().setIcon(new ImageIcon("ver.png"));
+        ver.getIcon().setIcon(new ImageIcon("images/ver.png"));
     }
 }

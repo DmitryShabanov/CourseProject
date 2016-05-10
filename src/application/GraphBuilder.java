@@ -13,6 +13,7 @@ public class GraphBuilder extends JFrame {
     protected WorkPanel workPanel = new WorkPanel();
     protected ArrayList<Vertex> vertexes = new ArrayList<>();
     protected ArrayList<Point> points = new ArrayList<>();
+    protected int width, height;
 
     protected Edge edge;
     protected boolean edgeFlag = false;
@@ -37,9 +38,29 @@ public class GraphBuilder extends JFrame {
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1350, 800);
+        setMinimumSize(new Dimension(600, 400));
         //setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
+
+        height = this.getHeight();
+        width = this.getWidth();
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                /*rePaint();*/
+                int count = 0;
+                int newWidth = e.getComponent().getWidth();
+                int newHeight = e.getComponent().getHeight() - 210;
+                for (Vertex vertex : vertexes) {
+                    double xp = (int) (points.get(count).getX() / (width / 100));
+                    double yp = (int) (points.get(count).getY() / ((height - 210) / 100));
+                    vertex.setLocation(new Point((int) (xp * (newWidth / 100)), (int) (yp * (newHeight / 100))));
+                    count++;
+                }
+            }
+        });
 
         addToolBar();
         add(workPanel);
@@ -164,15 +185,25 @@ public class GraphBuilder extends JFrame {
     public void addToolBar() {
         JToolBar toolBar = new JToolBar();
         JButton addVer = new JButton("Добавить вершину");
+        JButton delVer = new JButton("Удалить вершину");
         JButton calculateWay = new JButton("Найти путь");
 
         addVer.addActionListener(new AddVertexListener());
+        delVer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteVertex();
+                setFocus();
+            }
+        });
         calculateWay.addActionListener(new WayListener());
         start.setColumns(2);
         finish.setColumns(2);
 
         toolBar.add(addVer);
+        toolBar.add(delVer);
         addVer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        delVer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         calculateWay.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         toolBar.add(new JLabel(" Начальная вершина:  "));
         toolBar.add(start);
@@ -197,8 +228,8 @@ public class GraphBuilder extends JFrame {
         });
         toolBar.add(clear);
 
-        JButton b1 = new JButton(new ImageIcon("forwardButton.png"));
-        JButton b2 = new JButton(new ImageIcon("backButton.png"));
+        JButton b1 = new JButton(new ImageIcon("images/forwardButton.png"));
+        JButton b2 = new JButton(new ImageIcon("images/backButton.png"));
         b1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         b2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         b1.setMaximumSize(new Dimension(30, 30));

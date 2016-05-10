@@ -14,6 +14,6 @@ public class SuitedDecorator extends VertexDecorator {
     @Override
     public void draw() {
         Vertex ver = (Vertex) vertex;
-        ver.getIcon().setIcon(new ImageIcon("suitedVer.png"));
+        ver.getIcon().setIcon(new ImageIcon("images/suitedVer.png"));
     }
 }

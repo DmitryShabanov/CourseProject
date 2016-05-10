@@ -14,6 +14,6 @@ public class HoverDecorator extends VertexDecorator {
     @Override
     public void draw() {
         Vertex ver = (Vertex) vertex;
-        ver.getIcon().setIcon(new ImageIcon("hoverVer.png"));
+        ver.getIcon().setIcon(new ImageIcon("images/hoverVer.png"));
     }
 }
