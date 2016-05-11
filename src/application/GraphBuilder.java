@@ -49,16 +49,7 @@ public class GraphBuilder extends JFrame {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                /*rePaint();*/
-                int count = 0;
-                int newWidth = e.getComponent().getWidth();
-                int newHeight = e.getComponent().getHeight() - 210;
-                for (Vertex vertex : vertexes) {
-                    double xp = (int) (points.get(count).getX() / (width / 100));
-                    double yp = (int) (points.get(count).getY() / ((height - 210) / 100));
-                    vertex.setLocation(new Point((int) (xp * (newWidth / 100)), (int) (yp * (newHeight / 100))));
-                    count++;
-                }
+                rePaint();
             }
         });
 

@@ -62,7 +62,7 @@ public class DragListener extends MouseInputAdapter {
         location = component.getLocation(location);
         int x = location.x - pressed.getX() + e.getX();
         int y = location.y - pressed.getY() + e.getY();
-        if (x + component.getWidth() > GraphBuilder.getInstance().workPanel.getWidth() + GraphBuilder.getInstance().workPanel.getX() || x < 0) {
+        if (x + component.getWidth() > GraphBuilder.getInstance().workPanel.getWidth() || x < 0) {
             return;
         }
         if (y + component.getHeight() > GraphBuilder.getInstance().workPanel.getHeight() || y < 0) {

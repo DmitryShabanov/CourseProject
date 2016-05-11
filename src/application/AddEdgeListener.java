@@ -43,14 +43,13 @@ public class AddEdgeListener extends MouseInputAdapter {
             decorator.draw();
             GraphBuilder.getInstance().select = "";
             GraphBuilder.getInstance().workPanel.addEdge(GraphBuilder.getInstance().edge);
-            GraphBuilder.getInstance().edge.getWeight().addFocusListener(new FocusAdapter() {
+            /*GraphBuilder.getInstance().edge.getWeight().addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
-                    JFormattedTextField field = (JFormattedTextField) e.getComponent();
                     GraphBuilder.getInstance().clearVertexes();
                     GraphBuilder.getInstance().saveState();
                 }
-            });
+            });*/
             GraphBuilder.getInstance().saveVertexLocation();
             GraphBuilder.getInstance().workPanel.validate();
             GraphBuilder.getInstance().rePaint();
