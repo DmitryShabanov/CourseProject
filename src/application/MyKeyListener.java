@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
  */
 public class MyKeyListener extends KeyAdapter {
     @Override
-    public void keyReleased(KeyEvent e) {
+    public void keyPressed(KeyEvent e) {
         //back
         if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z) {
             GraphBuilder.getInstance().ctrlZ();

@@ -2,6 +2,8 @@ package application;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 /**
@@ -11,21 +13,44 @@ public class WorkPanel extends JPanel {
 
     private ArrayList<Edge> edges = new ArrayList<>();
 
-    public void addEdge(Edge edge) {
+    public boolean addEdge(Edge edge) {
         for (Edge current : edges) {
             if (current.equals(edge)) {
-                return;
+                return false;
             }
             if (current.counterEdge(edge)) {
                 edge.setWeight(current.getWeight());
                 edges.add(edge);
                 repaint();
-                return;
+                return false;
             }
         }
+        edge.getWeight().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_X) {
+                    Component component = e.getComponent();
+                    for (int i = 0; i < edges.size(); i++) {
+                        if (edges.get(i).getWeight().equals(component)) {
+                            GraphBuilder.getInstance().historyModel.add(0, "Удалено ребро: от вершины " + edges.get(i).getStart().getNumber() + " к вершине " + edges.get(i).getEnd().getNumber());
+                            GraphBuilder.getInstance().saveVertexLocation();
+                            remove(edges.get(i).getWeight());
+                            validate();
+                            repaint();
+                            GraphBuilder.getInstance().rePaint();
+                            edges.remove(edges.get(i));
+                            i--;
+                        }
+                    }
+                    GraphBuilder.getInstance().saveState();
+                    GraphBuilder.getInstance().setFocus();
+                }
+            }
+        });
         edges.add(edge);
         repaint();
         add(edge.getWeight());
+        return true;
     }
 
     public ArrayList<Edge> getEdges() {

@@ -13,6 +13,11 @@ public class AddEdgeListener extends MouseInputAdapter {
     @Override
     public void mouseClicked(MouseEvent e) {
         JLabel component = (JLabel) e.getComponent();
+        if (e.getClickCount() > 1 || GraphBuilder.getInstance().select.compareTo(component.getText()) == 0) {
+            GraphBuilder.getInstance().select = "";
+            GraphBuilder.getInstance().edgeFlag = false;
+            return;
+        }
         GraphBuilder.getInstance().clearVertexes();
         if (!GraphBuilder.getInstance().edgeFlag) {
             GraphBuilder.getInstance().edge = new Edge();
@@ -42,19 +47,13 @@ public class AddEdgeListener extends MouseInputAdapter {
             MyComponent decorator = new ResetDecorator(GraphBuilder.getInstance().edge.getStart());
             decorator.draw();
             GraphBuilder.getInstance().select = "";
-            GraphBuilder.getInstance().workPanel.addEdge(GraphBuilder.getInstance().edge);
-            /*GraphBuilder.getInstance().edge.getWeight().addFocusListener(new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    GraphBuilder.getInstance().clearVertexes();
-                    GraphBuilder.getInstance().saveState();
-                }
-            });*/
-            GraphBuilder.getInstance().saveVertexLocation();
-            GraphBuilder.getInstance().workPanel.validate();
-            GraphBuilder.getInstance().rePaint();
-            GraphBuilder.getInstance().historyModel.add(0, "Добавлено новое ребро: от вершины " + GraphBuilder.getInstance().edge.getStart().getNumber() + " к вершине " + GraphBuilder.getInstance().edge.getEnd().getNumber());
-            GraphBuilder.getInstance().saveState();
+            if (GraphBuilder.getInstance().workPanel.addEdge(GraphBuilder.getInstance().edge)) {
+                GraphBuilder.getInstance().saveVertexLocation();
+                GraphBuilder.getInstance().workPanel.validate();
+                GraphBuilder.getInstance().rePaint();
+                GraphBuilder.getInstance().historyModel.add(0, "Добавлено новое ребро: от вершины " + GraphBuilder.getInstance().edge.getStart().getNumber() + " к вершине " + GraphBuilder.getInstance().edge.getEnd().getNumber());
+                GraphBuilder.getInstance().saveState();
+            }
             GraphBuilder.getInstance().setFocus();
         }
         GraphBuilder.getInstance().setFocus();

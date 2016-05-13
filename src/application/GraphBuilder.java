@@ -37,9 +37,9 @@ public class GraphBuilder extends JFrame {
         super("Graph Builder");
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1350, 800);
+        setSize(1350, 750);
         setMinimumSize(new Dimension(600, 400));
-        //setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setResizable(true);
 
@@ -103,7 +103,7 @@ public class GraphBuilder extends JFrame {
         for (int i = 0; i < historyModel.size(); i++) {
             historyLog.add((String) historyModel.get(i));
         }
-        Memento state = new Memento(vertexes, workPanel.getEdges(), historyLog);
+        Memento state = new Memento(vertexes, workPanel.getEdges(), historyLog, numbers);
         currentState++;
         history.addState(state, currentState);
     }
@@ -111,12 +111,16 @@ public class GraphBuilder extends JFrame {
     public boolean loadState(int index) {
         clearState();
         historyModel.removeAllElements();
+        numbers.clear();
         Memento state = history.getState(index);
         if (state == null) {
             return false;
         }
         for (String log : state.getHistoryLog()) {
             historyModel.addElement(log);
+        }
+        for (String num : state.getNumbers()) {
+            numbers.add(num);
         }
         vertexes = state.getVertexes();
         for (Vertex current : vertexes) {
@@ -246,6 +250,8 @@ public class GraphBuilder extends JFrame {
     }
 
     public void ctrlY() {
+        edgeFlag = false;
+        select = "";
         if (loadState(currentState + 1)) {
             currentState++;
         }
@@ -253,6 +259,8 @@ public class GraphBuilder extends JFrame {
     }
 
     public void ctrlZ() {
+        edgeFlag = false;
+        select = "";
         if (loadState(currentState - 1)) {
             currentState--;
         }
@@ -279,6 +287,8 @@ public class GraphBuilder extends JFrame {
 
     public void addNewVer() {
         clearVertexes();
+        edgeFlag = false;
+        select = "";
         Vertex newVer = new Vertex(workPanel);
         if (!numbers.isEmpty()) {
             sortNumbers();
